@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理员登录验证</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-900 flex items-center justify-center h-screen">
+
+<div class="bg-gray-800 p-8 rounded-lg shadow-lg text-white w-96">
+    <h2 class="text-2xl font-bold mb-4">管理员身份验证</h2>
+
+    <!-- 公告栏 -->
+    <div class="bg-yellow-500 text-black p-3 mb-4 rounded-lg">
+        <p class="font-bold">欢迎</p>
+        <p>请使用同一设备并关闭所有VPN及加速器</p>
+        <p>若有任何问题请同你的主管领导联系</p>
+        <p>Ver1.0.12 by Chirnuo</p>
+    </div>
+
+    <input type="text" id="playerID" placeholder="玩家 ID" class="w-full p-2 mb-2 rounded bg-gray-700 text-white">
+    <input type="email" id="email" placeholder="邮箱" class="w-full p-2 mb-2 rounded bg-gray-700 text-white">
+    <button onclick="requestCode()" class="w-full bg-blue-600 p-2 rounded hover:bg-blue-700">获取验证码</button>
+
+    <div id="verify-section" class="hidden mt-4">
+        <input type="text" id="verify_code" placeholder="验证码" class="w-full p-2 mb-2 rounded bg-gray-700 text-white">
+        <button onclick="verifyCode()" class="w-full bg-green-600 p-2 rounded hover:bg-green-700">提交验证码</button>
+    </div>
+
+    <p id="message" class="text-red-400 mt-2"></p>
+</div>
+
+<!-- 反馈弹窗 -->
+<div id="feedback-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center">
+    <div class="bg-gray-800 p-6 rounded-lg shadow-lg text-white w-80 text-center">
+        <p id="feedback-text" class="text-lg"></p>
+        <button onclick="closeModal()" class="mt-4 w-full bg-blue-600 p-2 rounded hover:bg-blue-700">确定</button>
+    </div>
+</div>
+
+<script>
+function requestCode() {
+    const playerID = document.getElementById("playerID").value;
+    const email = document.getElementById("email").value;
+
+    fetch("admin_auth.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: `playerID=${encodeURIComponent(playerID)}&email=${encodeURIComponent(email)}`
+    })
+    .then(res => res.json())
+    .then(data => {
+        document.getElementById("message").textContent = data.message;
+        if (data.status === "success") {
+            document.getElementById("verify-section").classList.remove("hidden");
+        } else {
+            showModal(data.message, "error");
+        }
+    })
+    .catch(error => {
+        showModal("请求失败，请稍后再试！", "error");
+    });
+}
+
+function verifyCode() {
+    const verify_code = document.getElementById("verify_code").value;
+
+    fetch("admin_auth.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: `verify_code=${encodeURIComponent(verify_code)}`
+    })
+    .then(res => res.json())
+    .then(data => {
+        showModal(data.message, data.status);
+    })
+    .catch(error => {
+        showModal("请重新登录游戏查看验证状态！", "error");
+    });
+}
+
+function showModal(message, status) {
+    const modal = document.getElementById("feedback-modal");
+    const feedbackText = document.getElementById("feedback-text");
+
+    feedbackText.textContent = message;
+
+    if (status === "success") {
+        feedbackText.classList.add("text-green-400");
+        feedbackText.classList.remove("text-red-400");
+    } else {
+        feedbackText.classList.add("text-red-400");
+        feedbackText.classList.remove("text-green-400");
+    }
+
+    modal.classList.remove("hidden");
+}
+
+function closeModal() {
+    document.getElementById("feedback-modal").classList.add("hidden");
+}
+</script>
+
+</body>
+</html>
