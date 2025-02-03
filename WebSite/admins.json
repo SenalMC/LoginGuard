@@ -1,0 +1,14 @@
+{
+    "admins": {
+        "player123": {
+            "email": "admin@example.com",
+            "allowed_ip": null,
+            "expire_time": null
+        },
+        "admin456": {
+            "email": "admin@123.456",
+            "allowed_ip": null,
+            "expire_time": null
+        }
+    }
+}
