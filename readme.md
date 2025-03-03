@@ -1,4 +1,5 @@
 LoginGuard
+If you need English, please visit https://chirnuo.com
 LoginGuard 是一个用于保护 BungeeCord 服务器管理员账户的工具，旨在防止恶意登录。
 
 使用方法
